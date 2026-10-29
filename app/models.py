@@ -1,3 +1,4 @@
+                          app/models.py
 """Модели предметной области."""
 
 
@@ -9,6 +10,3 @@ class User:
         self.email = email
 
     def info(self) -> str:
-        return f"{self.username} <{self.email}>"
-
-
