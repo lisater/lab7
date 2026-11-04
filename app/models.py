@@ -1,4 +1,4 @@
-"""Модели предметной области: User, Currency, Rate."""
+"""Модели предметной области: User, Currency, Subscription, Rate."""
 from __future__ import annotations
 import re
 from datetime import date, datetime
@@ -149,6 +149,40 @@ class Currency(BaseEntity):
         return f"Currency(id={self.id}, code={self.code!r})"
 
 
+class Subscription:
+    """Подписка пользователя на валюту (связь многие-ко-многим)."""
+
+    def __init__(self, user: User, currency: Currency) -> None:
+        self.user = user
+        self.currency = currency
+
+    @property
+    def user_id(self) -> int:
+        return self.user.id
+
+    @property
+    def currency_id(self) -> int:
+        return self.currency.id
+
+    @property
+    def key(self) -> tuple[int, int]:
+        """Составной ключ: пара (user_id, currency_id)."""
+        return (self.user_id, self.currency_id)
+
+    def __eq__(self, other: object) -> bool:
+        # TODO: сравните ключи (key). Если other не Subscription — верните NotImplemented
+        if not isinstance(other, Subscription):
+            return NotImplemented
+        return self.key == other.key
+
+    def __hash__(self) -> int:
+        # TODO: верните хеш от кортежа (self.key)
+        return hash(self.key)
+
+    def __str__(self) -> str:
+        return f"{self.user.username} подписан на {self.currency.code}"
+
+
 class Rate:
     """Курс валюты на дату. Не хранится в БД."""
 
@@ -166,7 +200,6 @@ class Rate:
 
     @property
     def per_unit(self) -> Decimal:
-        """Стоимость одной единицы валюты в рублях."""
         return self.value / self.nominal
 
     def __eq__(self, other: object) -> bool:
